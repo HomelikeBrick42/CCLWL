@@ -17,6 +17,7 @@ namespace CCLWL
 
                 var filepath = args[0];
 
+                /*
                 var lexer = new Lexer(filepath);
                 while (true)
                 {
@@ -25,6 +26,10 @@ namespace CCLWL
                     if (token.Kind == TokenKind.EndOfFile)
                         break;
                 }
+                */
+
+                var parser = new Parser(filepath);
+                var ast = parser.Parse();
 
                 return 0;
             }

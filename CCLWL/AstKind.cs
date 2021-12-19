@@ -2,5 +2,8 @@
 {
     public enum AstKind
     {
+        File,
+        Statement,
+        Expression,
     }
 }
