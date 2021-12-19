@@ -30,6 +30,7 @@ namespace CCLWL
 
                 var parser = new Parser(filepath);
                 var ast = parser.Parse();
+                PrintTypes(ast);
 
                 return 0;
             }
@@ -44,6 +45,104 @@ namespace CCLWL
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(e);
                 return 1;
+            }
+        }
+        
+        private static void PrintTypes(AstNode ast)
+        {
+            switch (ast.Kind)
+            {
+                case AstKind.File:
+                {
+                    var file = (AstFile) ast;
+                    foreach (var statement in file.Statements)
+                    {
+                        PrintTypes(statement);
+                        Console.WriteLine();
+                    }
+                    break;
+                }
+                
+                case AstKind.Statement:
+                {
+                    var statement = (AstStatement) ast;
+                    switch (statement.StatementKind)
+                    {
+                        case AstStatementKind.Declaration:
+                        {
+                            var declaration = (AstDeclaration) ast;
+                            Console.Write($"declare {(string) declaration.Name.Value} as ");
+                            PrintTypes(declaration.Type);
+                            break;
+                        }
+
+                        case AstStatementKind.Expression:
+                            throw new NotImplementedException();
+                        
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                    break;
+                }
+
+                case AstKind.Expression:
+                    throw new NotImplementedException();
+
+                case AstKind.Type:
+                {
+                    var type = (AstType) ast;
+                    switch (type.TypeKind)
+                    {
+                        case AstTypeKind.Integer:
+                        {
+                            var integer = (AstIntegerType) type;
+                            Console.Write($"{integer.Size}-byte integer ");
+                            break;
+                        }
+
+                        case AstTypeKind.Pointer:
+                        {
+                            var pointer = (AstPointerType) type;
+                            Console.Write("pointer to ");
+                            PrintTypes(pointer.PointedTo);
+                            break;
+                        }
+
+                        case AstTypeKind.Array:
+                        {
+                            var array = (AstArrayType) type;
+                            Console.Write($"array {array.Count} of ");
+                            PrintTypes(array.InnerType);
+                            break;
+                        }
+
+                        case AstTypeKind.Function:
+                        {
+                            var function = (AstFunctionType) type;
+                            Console.Write("function ( ");
+                            var useComma = false;
+                            foreach (var decl in function.Parameters)
+                            {
+                                if (useComma)
+                                    Console.Write(", ");
+                                else
+                                    useComma = true;
+                                PrintTypes(decl.Type);
+                            }
+                            Console.Write(") returning ");
+                            PrintTypes(function.ReturnType);
+                            break;
+                        }
+                            
+                        default:
+                            throw new InvalidOperationException();
+                    }
+
+                    break;
+                }
+                
+                default:
+                    throw new InvalidOperationException();
             }
         }
     }

@@ -16,12 +16,18 @@ namespace CCLWL
 
         public static readonly Dictionary<char, TokenKind> SingleChars = new()
         {
+            {',', TokenKind.Comma},
+            {';', TokenKind.Semicolon},
+            {'(', TokenKind.OpenParenthesis},
+            {')', TokenKind.CloseParenthesis},
+            {'[', TokenKind.OpenBracket},
+            {']', TokenKind.CloseBracket},
+            
             {'+', TokenKind.Plus},
             {'-', TokenKind.Minus},
             {'*', TokenKind.Asterisk},
             {'/', TokenKind.Slash},
             {'=', TokenKind.Equals},
-            {';', TokenKind.Semicolon}
         };
 
         private int _column;

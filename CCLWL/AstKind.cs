@@ -5,5 +5,6 @@
         File,
         Statement,
         Expression,
+        Type,
     }
 }

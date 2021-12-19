@@ -4,5 +4,6 @@
     {
         public override AstKind Kind => AstKind.Expression;
         public abstract AstExpressionKind ExpressionKind { get; }
+        public abstract AstType Type { get; }
     }
 }

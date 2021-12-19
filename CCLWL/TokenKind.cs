@@ -7,7 +7,12 @@
         Name,
         Integer,
         
+        Comma,
         Semicolon,
+        OpenParenthesis,
+        CloseParenthesis,
+        OpenBracket,
+        CloseBracket,
 
         Plus,
         Minus,

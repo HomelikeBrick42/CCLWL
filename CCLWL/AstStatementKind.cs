@@ -2,5 +2,7 @@
 {
     public enum AstStatementKind
     {
+        Declaration,
+        Expression,
     }
 }
