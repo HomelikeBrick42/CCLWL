@@ -1,0 +1,16 @@
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\CCLWL.exe
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\CCLWL.deps.json
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\CCLWL.runtimeconfig.json
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\CCLWL.runtimeconfig.dev.json
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\CCLWL.dll
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\ref\CCLWL.dll
+C:\Dev\C#\CCLWL\CCLWL\bin\Debug\net5.0\CCLWL.pdb
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.csproj.AssemblyReference.cache
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.AssemblyInfoInputs.cache
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.AssemblyInfo.cs
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.csproj.CoreCompileInputs.cache
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.dll
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\ref\CCLWL.dll
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.pdb
+C:\Dev\C#\CCLWL\CCLWL\obj\Debug\net5.0\CCLWL.genruntimeconfig.cache
