@@ -3,6 +3,8 @@
     public enum AstStatementKind
     {
         Declaration,
+        Scope,
+        Function,
         Expression,
     }
 }

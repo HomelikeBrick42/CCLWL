@@ -22,6 +22,8 @@ namespace CCLWL
             {')', TokenKind.CloseParenthesis},
             {'[', TokenKind.OpenBracket},
             {']', TokenKind.CloseBracket},
+            {'{', TokenKind.OpenBrace},
+            {'}', TokenKind.CloseBrace},
             
             {'+', TokenKind.Plus},
             {'-', TokenKind.Minus},

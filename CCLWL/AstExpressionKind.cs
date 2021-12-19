@@ -4,5 +4,7 @@
     {
         Unary,
         Binary,
+        Integer,
+        Name,
     }
 }

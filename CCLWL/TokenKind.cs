@@ -13,6 +13,8 @@
         CloseParenthesis,
         OpenBracket,
         CloseBracket,
+        OpenBrace,
+        CloseBrace,
 
         Plus,
         Minus,

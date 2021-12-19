@@ -1,8 +1,5 @@
-﻿int a;
-int* b;
-int c[5];
-int* d[5];
-int* e[5][6];
-int (*f)[10];
-char** string_array;
-int (*foo)(int* a, int b[5]);
+﻿void main() {
+    int a = 1 + -2 * 3;
+    char b = 5;
+    int c = a + b;
+}

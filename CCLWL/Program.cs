@@ -30,7 +30,6 @@ namespace CCLWL
 
                 var parser = new Parser(filepath);
                 var ast = parser.Parse();
-                PrintTypes(ast);
 
                 return 0;
             }
@@ -131,6 +130,12 @@ namespace CCLWL
                             }
                             Console.Write(") returning ");
                             PrintTypes(function.ReturnType);
+                            break;
+                        }
+
+                        case AstTypeKind.Void:
+                        {
+                            Console.Write("void ");
                             break;
                         }
                             
