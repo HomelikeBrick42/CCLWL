@@ -490,10 +490,10 @@ namespace CCLWL
                         if (name != null)
                             throw new CompileError("Unexpected name in cast", name.Position);
                         ExpectToken(TokenKind.CloseParenthesis);
-                        var expression = ParseExpression(type);
+                        var expression = ParseBinaryExpression(type, 100000);
                         // TODO: Disallow struct/union casts
                         if (type.TypeKind != expression.Type.TypeKind && type.Size != expression.Type.Size)
-                            throw new CompileError("Cannot cast type", openParenthesis.Position);
+                            throw new CompileError("Invalid cast", openParenthesis.Position);
                         return new AstCast(type, expression);
                     }
                     else

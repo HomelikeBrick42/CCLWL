@@ -3,6 +3,8 @@
 distinct int yard;
 distinct int meter;
 
+typedef int (*test_func)(int x);
+
 int fib(int x) {
     if x < 2 do return x;
     return fib(x-1) + fib(x-2);
@@ -25,4 +27,7 @@ void main() {
     }
     var d = &i;
     *d = 5;
+    test_func func = &fib;
+    if ((int)1 == 1) do func = &factorial;
+    int result = (*func)(6);
 }

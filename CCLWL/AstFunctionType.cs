@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace CCLWL
 {
@@ -23,7 +25,31 @@ namespace CCLWL
 
         public override bool Matches(AstType other)
         {
-            return this == other;
+            if (other.TypeKind == AstTypeKind.Function)
+            {
+                var function = (AstFunctionType) other;
+                if (Parameters.Count() != function.Parameters.Count())
+                    return false;
+
+                var funcA = Parameters.GetEnumerator();
+                var funcB = function.Parameters.GetEnumerator();
+                
+                while (true)
+                {
+                    if (!funcA.MoveNext())
+                        break;
+                    if (!funcB.MoveNext())
+                        break;
+                    var paramA = funcA.Current;
+                    var paramB = funcB.Current;
+                    if (!paramA.Type.Matches(paramB.Type))
+                        return false;
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }
