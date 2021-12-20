@@ -462,6 +462,14 @@ namespace CCLWL
                     return new AstName(declaration, name);
                 }
 
+                case TokenKind.OpenParenthesis:
+                {
+                    ExpectToken(TokenKind.OpenParenthesis);
+                    var expression = ParseExpression(suggestedType);
+                    ExpectToken(TokenKind.CloseParenthesis);
+                    return expression;
+                }
+
                 default:
                     throw new CompileError($"Unexpected '{Current.Kind}' in expression", Current.Position);
             }
