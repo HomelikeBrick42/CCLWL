@@ -32,6 +32,7 @@ namespace CCLWL
                 new()
                 {
                     {"void", new AstVoidType()},
+                    {"bool", new AstBoolType()},
                     {"int64", new AstIntegerType(8)},
                     {"int32", new AstIntegerType(4)},
                     {"int16", new AstIntegerType(2)},
@@ -81,11 +82,11 @@ namespace CCLWL
         {
             var statements = new List<AstStatement>();
             while (Current.Kind != TokenKind.EndOfFile)
-                statements.Add(ParseStatement());
+                statements.Add(ParseStatement(null));
             return new AstFile(statements);
         }
 
-        private AstStatement ParseStatement()
+        private AstStatement ParseStatement(AstFunctionType currentFunction)
         {
             if (Current.Kind == TokenKind.Name && GetType((string) Current.Value) != null)
             {
@@ -108,7 +109,7 @@ namespace CCLWL
                     foreach (var parameter in ((AstFunctionType) type).Parameters)
                         parameters.Add((string) parameter.Name.Value, parameter);
 
-                    var scope = ParseScope(parameters);
+                    var scope = ParseScope((AstFunctionType) type, parameters);
                     return new AstFunction((string) name.Value, type, scope);
                 }
                 else
@@ -163,6 +164,44 @@ namespace CCLWL
                     return new AstDistinct(nameString, typeClone);
                 }
 
+                case TokenKind.IfKeyword:
+                {
+                    var ifKeyword = ExpectToken(TokenKind.IfKeyword);
+                    var condition = ParseExpression(null);
+                    if (condition.Type.TypeKind != AstTypeKind.Bool)
+                        throw new CompileError("Expected bool type for `if` condition", ifKeyword.Position);
+                    if (Current.Kind == TokenKind.DoKeyword)
+                    {
+                        ExpectToken(TokenKind.DoKeyword);
+                        var thenStatement = ParseStatement(currentFunction);
+                        return new AstIf(condition, thenStatement, null);
+                    }
+
+                    var thenScope = ParseScope(currentFunction);
+                    AstScope elseScope = null;
+                    if (Current.Kind == TokenKind.ElseKeyword)
+                    {
+                        ExpectToken(TokenKind.ElseKeyword);
+                        elseScope = ParseScope(currentFunction);
+                    }
+
+                    return new AstIf(condition, thenScope, elseScope);
+                }
+
+                case TokenKind.ReturnKeyword:
+                {
+                    var returnKeyword = ExpectToken(TokenKind.ReturnKeyword);
+                    AstExpression expression = null;
+                    if (Current.Kind != TokenKind.Semicolon)
+                        expression = ParseExpression(currentFunction.ReturnType);
+                    ExpectToken(TokenKind.Semicolon);
+                    if (expression == null && currentFunction.ReturnType.TypeKind == AstTypeKind.Void ||
+                        expression != null && expression.Type != currentFunction.ReturnType)
+                        throw new CompileError("Function return type and return expression type do not match",
+                            returnKeyword.Position);
+                    return new AstReturn(expression);
+                }
+
                 default:
                 {
                     var expression = ParseExpression(null);
@@ -172,14 +211,15 @@ namespace CCLWL
             }
         }
 
-        private AstScope ParseScope(Dictionary<string, AstDeclaration> procedureParameters = null)
+        private AstScope ParseScope(AstFunctionType currentFunction,
+            Dictionary<string, AstDeclaration> procedureParameters = null)
         {
             _scopes.Add(procedureParameters ?? new Dictionary<string, AstDeclaration>());
             _types.Add(new Dictionary<string, AstType>());
             ExpectToken(TokenKind.OpenBrace);
             var statements = new List<AstStatement>();
             while (Current.Kind != TokenKind.CloseBrace && Current.Kind != TokenKind.EndOfFile)
-                statements.Add(ParseStatement());
+                statements.Add(ParseStatement(currentFunction));
             ExpectToken(TokenKind.CloseBrace);
             _types.RemoveAt(_types.Count - 1);
             _scopes.RemoveAt(_scopes.Count - 1);
@@ -320,8 +360,8 @@ namespace CCLWL
         {
             return kind switch
             {
-                TokenKind.Plus => 3,
-                TokenKind.Minus => 3,
+                TokenKind.Plus => 5,
+                TokenKind.Minus => 5,
                 _ => 0
             };
         }
@@ -330,15 +370,20 @@ namespace CCLWL
         {
             return kind switch
             {
-                TokenKind.Asterisk => 2,
-                TokenKind.Slash => 2,
-                TokenKind.Plus => 1,
-                TokenKind.Minus => 1,
+                TokenKind.Asterisk => 4,
+                TokenKind.Slash => 4,
+                TokenKind.Plus => 3,
+                TokenKind.Minus => 3,
+                TokenKind.LessThan => 2,
+                TokenKind.LessThanEquals => 2,
+                TokenKind.GreaterThan => 2,
+                TokenKind.GreaterThanEquals => 2,
+                TokenKind.EqualsEquals => 1,
                 _ => 0
             };
         }
 
-        private static AstType GetUnaryResultType(TokenKind @operator, AstType operand)
+        private AstType GetUnaryResultType(TokenKind @operator, AstType operand)
         {
             // TODO: Better type checking
             if (operand.TypeKind == AstTypeKind.Integer)
@@ -346,12 +391,37 @@ namespace CCLWL
             return null;
         }
 
-        private static AstType GetBinaryResultType(TokenKind @operator, AstType left, AstType right)
+        private AstType GetBinaryResultType(TokenKind @operator, AstType left, AstType right)
         {
-            // TODO: Better type checking
-            if (left.TypeKind == AstTypeKind.Integer && left == right)
-                return left;
-            return null;
+            switch (@operator)
+            {
+                case TokenKind.Plus:
+                case TokenKind.Minus:
+                case TokenKind.Asterisk:
+                case TokenKind.Slash:
+                    if (left.TypeKind == AstTypeKind.Integer && left == right)
+                        return left;
+                    else
+                        return null;
+
+                case TokenKind.EqualsEquals:
+                    if (left == right)
+                        return GetType("bool");
+                    else
+                        return null;
+
+                case TokenKind.LessThan:
+                case TokenKind.LessThanEquals:
+                case TokenKind.GreaterThan:
+                case TokenKind.GreaterThanEquals:
+                    if (left.TypeKind == AstTypeKind.Integer && left == right)
+                        return GetType("bool");
+                    else
+                        return null;
+
+                default:
+                    return null;
+            }
         }
 
         private AstExpression ParseBinaryExpression(AstType suggestedType, int parentPrecedence)
@@ -374,6 +444,31 @@ namespace CCLWL
 
             while (true)
             {
+                while (Current.Kind == TokenKind.OpenParenthesis)
+                {
+                    if (left.Type.TypeKind != AstTypeKind.Function)
+                        throw new CompileError("Cannot call a non-function", Current.Position);
+                    var functionType = (AstFunctionType) left.Type;
+
+                    var arguments = new List<AstExpression>();
+                    var argIndex = 0;
+                    var errorToken = ExpectToken(TokenKind.OpenParenthesis);
+                    foreach (var parameter in functionType.Parameters)
+                    {
+                        if (argIndex > 0)
+                            errorToken = ExpectToken(TokenKind.Comma);
+                        var argument = ParseExpression(parameter.Type);
+                        if (argument.Type != parameter.Type)
+                            throw new CompileError($"Argument {argIndex} type does not match paramter type",
+                                errorToken.Position);
+                        arguments.Add(argument);
+                        argIndex++;
+                    }
+
+                    ExpectToken(TokenKind.CloseParenthesis);
+                    left = new AstFunctionCall(functionType, arguments);
+                }
+
                 var binaryPrecedence = GetBinaryPrecedence(Current.Kind);
                 if (binaryPrecedence <= parentPrecedence)
                     break;

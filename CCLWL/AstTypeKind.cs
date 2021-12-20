@@ -6,6 +6,7 @@
         Pointer,
         Array,
         Function,
-        Void
+        Void,
+        Bool
     }
 }

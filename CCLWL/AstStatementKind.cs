@@ -7,6 +7,8 @@
         Function,
         Expression,
         Typedef,
-        Distinct
+        Distinct,
+        If,
+        Return
     }
 }

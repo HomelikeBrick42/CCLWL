@@ -11,7 +11,10 @@ namespace CCLWL
             {'+', new Dictionary<char, TokenKind> {{'=', TokenKind.PlusEquals}}},
             {'-', new Dictionary<char, TokenKind> {{'=', TokenKind.MinusEquals}}},
             {'*', new Dictionary<char, TokenKind> {{'=', TokenKind.AsteriskEquals}}},
-            {'/', new Dictionary<char, TokenKind> {{'=', TokenKind.SlashEquals}}}
+            {'/', new Dictionary<char, TokenKind> {{'=', TokenKind.SlashEquals}}},
+            {'=', new Dictionary<char, TokenKind> {{'=', TokenKind.EqualsEquals}}},
+            {'<', new Dictionary<char, TokenKind> {{'=', TokenKind.LessThanEquals}}},
+            {'>', new Dictionary<char, TokenKind> {{'=', TokenKind.GreaterThanEquals}}}
         };
 
         public static readonly Dictionary<char, TokenKind> SingleChars = new()
@@ -29,13 +32,19 @@ namespace CCLWL
             {'-', TokenKind.Minus},
             {'*', TokenKind.Asterisk},
             {'/', TokenKind.Slash},
-            {'=', TokenKind.Equals}
+            {'=', TokenKind.Equals},
+            {'<', TokenKind.LessThan},
+            {'>', TokenKind.GreaterThan}
         };
 
         public static readonly Dictionary<string, TokenKind> Keywords = new()
         {
             {"typedef", TokenKind.TypedefKeyword},
-            {"distinct", TokenKind.DistinctKeyword}
+            {"distinct", TokenKind.DistinctKeyword},
+            {"if", TokenKind.IfKeyword},
+            {"else", TokenKind.ElseKeyword},
+            {"do", TokenKind.DoKeyword},
+            {"return", TokenKind.ReturnKeyword}
         };
 
         private int _column;
@@ -157,8 +166,8 @@ namespace CCLWL
 
             if (DoubleChars.ContainsKey(character) && DoubleChars[character].ContainsKey(Current))
             {
-                NextChar();
-                return new Token(DoubleChars[character][Current], startPos, _position - startPos.Position);
+                var second = NextChar();
+                return new Token(DoubleChars[character][second], startPos, _position - startPos.Position);
             }
 
             if (SingleChars.ContainsKey(character))

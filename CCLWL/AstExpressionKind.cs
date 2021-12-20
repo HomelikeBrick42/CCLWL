@@ -5,6 +5,7 @@
         Unary,
         Binary,
         Integer,
-        Name
+        Name,
+        FunctionCall
     }
 }

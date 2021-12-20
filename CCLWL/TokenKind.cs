@@ -9,6 +9,10 @@
 
         TypedefKeyword,
         DistinctKeyword,
+        IfKeyword,
+        ElseKeyword,
+        DoKeyword,
+        ReturnKeyword,
 
         Comma,
         Semicolon,
@@ -24,10 +28,15 @@
         Asterisk,
         Slash,
         Equals,
+        LessThan,
+        GreaterThan,
 
         PlusEquals,
         MinusEquals,
         AsteriskEquals,
-        SlashEquals
+        SlashEquals,
+        EqualsEquals,
+        LessThanEquals,
+        GreaterThanEquals
     }
 }

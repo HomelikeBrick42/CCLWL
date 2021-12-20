@@ -3,8 +3,20 @@
 distinct int yard;
 distinct int meter;
 
+int fib(int x) {
+    if x < 2 do return x;
+    return fib(x-1) + fib(x-2);
+}
+
+int factorial(int n) {
+    if n == 1 do return 1;
+    return factorial(n - 1);
+}
+
 void main() {
     meter a = 1 + -2 * 3;
     yard b = 5;
     // meter c = a + b;
+    int fact = factorial(6);
+    int fib = fib(10);
 }
