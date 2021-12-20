@@ -167,7 +167,7 @@ namespace CCLWL
                 case TokenKind.IfKeyword:
                 {
                     var ifKeyword = ExpectToken(TokenKind.IfKeyword);
-                    var condition = ParseExpression(null);
+                    var condition = ParseExpression(GetType("bool"));
                     if (condition.Type.TypeKind != AstTypeKind.Bool)
                         throw new CompileError("Expected bool type for `if` condition", ifKeyword.Position);
                     if (Current.Kind == TokenKind.DoKeyword)
@@ -188,6 +188,25 @@ namespace CCLWL
                     return new AstIf(condition, thenScope, elseScope);
                 }
 
+                case TokenKind.WhileKeyword:
+                {
+                    var whileKeyword = ExpectToken(TokenKind.WhileKeyword);
+                    var condition = ParseExpression(GetType("bool"));
+                    if (condition.Type.TypeKind != AstTypeKind.Bool)
+                        throw new CompileError("Expected bool type for `while` condition", whileKeyword.Position);
+                    if (Current.Kind == TokenKind.DoKeyword)
+                    {
+                        ExpectToken(TokenKind.DoKeyword);
+                        var body = ParseStatement(currentFunction);
+                        return new AstWhile(condition, body);
+                    }
+                    else
+                    {
+                        var body = ParseScope(currentFunction);
+                        return new AstWhile(condition, body);
+                    }
+                }
+
                 case TokenKind.ReturnKeyword:
                 {
                     var returnKeyword = ExpectToken(TokenKind.ReturnKeyword);
@@ -205,10 +224,60 @@ namespace CCLWL
                 default:
                 {
                     var expression = ParseExpression(null);
+                    if (IsAssignmentOperator(Current.Kind))
+                    {
+                        var @operator = NextToken();
+                        if (!IsAssignable(expression))
+                            throw new CompileError("Expression is not assignable", @operator.Position);
+                        var value = ParseExpression(expression.Type);
+                        var resultType = GetBinaryResultType(AssignmentOperatorToBinaryOperator(@operator.Kind),
+                            expression.Type, value.Type);
+                        if (@operator.Kind != TokenKind.Equals && resultType == null)
+                            throw new CompileError("Unable to find binary operator for given types",
+                                @operator.Position);
+                        ExpectToken(TokenKind.Semicolon);
+                        return new AstAssignment(expression, @operator, value);
+                    }
+
                     ExpectToken(TokenKind.Semicolon);
                     return new AstExpressionStatement(expression);
                 }
             }
+        }
+
+        private bool IsAssignable(AstExpression expression)
+        {
+            return expression.ExpressionKind switch
+            {
+                AstExpressionKind.Name => true,
+                _ => false
+            };
+        }
+
+        private TokenKind AssignmentOperatorToBinaryOperator(TokenKind kind)
+        {
+            return kind switch
+            {
+                TokenKind.Equals => TokenKind.Equals,
+                TokenKind.PlusEquals => TokenKind.Plus,
+                TokenKind.MinusEquals => TokenKind.Minus,
+                TokenKind.AsteriskEquals => TokenKind.Asterisk,
+                TokenKind.SlashEquals => TokenKind.Slash,
+                _ => throw new InvalidOperationException()
+            };
+        }
+
+        private bool IsAssignmentOperator(TokenKind kind)
+        {
+            return kind switch
+            {
+                TokenKind.Equals => true,
+                TokenKind.PlusEquals => true,
+                TokenKind.MinusEquals => true,
+                TokenKind.AsteriskEquals => true,
+                TokenKind.SlashEquals => true,
+                _ => false
+            };
         }
 
         private AstScope ParseScope(AstFunctionType currentFunction, bool mainFunctionScope = false,
@@ -333,7 +402,6 @@ namespace CCLWL
         private bool ReturnsInAllCodePaths(AstScope scope)
         {
             foreach (var statement in scope.Statements)
-            {
                 switch (statement.StatementKind)
                 {
                     case AstStatementKind.If:
@@ -352,7 +420,6 @@ namespace CCLWL
                     case AstStatementKind.Return:
                         return true;
                 }
-            }
 
             return false;
         }
@@ -510,7 +577,7 @@ namespace CCLWL
                     break;
 
                 var @operator = NextToken();
-                var right = ParseBinaryExpression(suggestedType ?? left.Type, binaryPrecedence);
+                var right = ParseBinaryExpression(left.Type, binaryPrecedence);
                 var resultType = GetBinaryResultType(@operator.Kind, left.Type, right.Type);
                 if (resultType == null)
                     throw new CompileError("Unable to find binary operator for given types", @operator.Position);

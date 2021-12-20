@@ -9,6 +9,8 @@
         Typedef,
         Distinct,
         If,
-        Return
+        Return,
+        While,
+        Assignment
     }
 }

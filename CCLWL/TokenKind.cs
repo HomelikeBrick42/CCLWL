@@ -11,6 +11,7 @@
         DistinctKeyword,
         IfKeyword,
         ElseKeyword,
+        WhileKeyword,
         DoKeyword,
         ReturnKeyword,
 

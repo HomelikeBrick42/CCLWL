@@ -43,6 +43,7 @@ namespace CCLWL
             {"distinct", TokenKind.DistinctKeyword},
             {"if", TokenKind.IfKeyword},
             {"else", TokenKind.ElseKeyword},
+            {"while", TokenKind.WhileKeyword},
             {"do", TokenKind.DoKeyword},
             {"return", TokenKind.ReturnKeyword}
         };
