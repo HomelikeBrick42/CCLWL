@@ -33,10 +33,10 @@ namespace CCLWL
                 {
                     {"void", new AstVoidType()},
                     {"bool", new AstBoolType()},
-                    {"int64", new AstIntegerType(8)},
-                    {"int32", new AstIntegerType(4)},
-                    {"int16", new AstIntegerType(2)},
-                    {"int8", new AstIntegerType(1)}
+                    {"int64", new AstIntegerType(64, true)},
+                    {"int32", new AstIntegerType(32, true)},
+                    {"int16", new AstIntegerType(16, true)},
+                    {"int8", new AstIntegerType(8, true)}
                 }
             };
 
@@ -239,7 +239,9 @@ namespace CCLWL
                                     @operator.Position);
                         }
                         else if (!expression.Type.Matches(value.Type))
+                        {
                             throw new CompileError("Value type does not match operand type", @operator.Position);
+                        }
 
                         ExpectToken(TokenKind.Semicolon);
                         return new AstAssignment(expression, @operator, value);
@@ -450,7 +452,7 @@ namespace CCLWL
                     if (suggestedType != null && suggestedType.TypeKind == AstTypeKind.Integer)
                         type = (AstIntegerType) suggestedType;
                     else
-                        type = (AstIntegerType) GetType("int");
+                        throw new CompileError("Ambiguous type for integer literal", token.Position);
                     return new AstInteger(type, (long) token.Value);
                 }
 
