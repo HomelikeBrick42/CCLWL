@@ -16,13 +16,13 @@ int factorial(int n) {
 void main() {
     meter a = 1 + -2 * 3;
     yard b = 5;
-    // meter c = a + b;
+    meter c = a + (meter)b;
     int i = 1;
     while i <= 10 {
         int fact = factorial(i);
         int fib = fib(i);
         i += 1;
     }
-    int* c = &i;
-    *c = 5;
+    int* d = &i;
+    *d = 5;
 }
