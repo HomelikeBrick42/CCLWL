@@ -230,11 +230,15 @@ namespace CCLWL
                         if (!IsAssignable(expression))
                             throw new CompileError("Expression is not assignable", @operator.Position);
                         var value = ParseExpression(expression.Type);
-                        var resultType = GetBinaryResultType(AssignmentOperatorToBinaryOperator(@operator.Kind),
-                            expression.Type, value.Type);
-                        if (@operator.Kind != TokenKind.Equals && resultType == null)
-                            throw new CompileError("Unable to find binary operator for given types",
-                                @operator.Position);
+                        if (@operator.Kind != TokenKind.Equals)
+                        {
+                            var resultType = GetBinaryResultType(AssignmentOperatorToBinaryOperator(@operator.Kind),
+                                expression.Type, value.Type);
+                            if (resultType == null)
+                                throw new CompileError("Unable to find binary operator for given types",
+                                    @operator.Position);
+                        }
+
                         ExpectToken(TokenKind.Semicolon);
                         return new AstAssignment(expression, @operator, value);
                     }
@@ -247,11 +251,15 @@ namespace CCLWL
 
         private bool IsAssignable(AstExpression expression)
         {
-            return expression.ExpressionKind switch
+            switch (expression.ExpressionKind)
             {
-                AstExpressionKind.Name => true,
-                _ => false
-            };
+                case AstExpressionKind.Name:
+                    return true;
+                case AstExpressionKind.Unary:
+                    return ((AstUnary) expression).Operator.Kind == TokenKind.Asterisk;
+                default:
+                    return false;
+            }
         }
 
         private TokenKind AssignmentOperatorToBinaryOperator(TokenKind kind)
@@ -465,6 +473,8 @@ namespace CCLWL
             {
                 TokenKind.Plus => 5,
                 TokenKind.Minus => 5,
+                TokenKind.Ampersand => 5,
+                TokenKind.Asterisk => 5,
                 _ => 0
             };
         }
@@ -488,10 +498,25 @@ namespace CCLWL
 
         private AstType GetUnaryResultType(TokenKind @operator, AstType operand)
         {
-            // TODO: Better type checking
-            if (operand.TypeKind == AstTypeKind.Integer)
-                return operand;
-            return null;
+            switch (@operator)
+            {
+                case TokenKind.Plus:
+                case TokenKind.Minus:
+                    if (operand.TypeKind == AstTypeKind.Integer)
+                        return operand;
+                    return null;
+
+                case TokenKind.Ampersand:
+                    return new AstPointerType(operand);
+
+                case TokenKind.Asterisk:
+                    if (operand.TypeKind == AstTypeKind.Pointer)
+                        return ((AstPointerType) operand).PointedTo;
+                    return null;
+
+                default:
+                    throw new InvalidOperationException();
+            }
         }
 
         private AstType GetBinaryResultType(TokenKind @operator, AstType left, AstType right)
@@ -502,28 +527,25 @@ namespace CCLWL
                 case TokenKind.Minus:
                 case TokenKind.Asterisk:
                 case TokenKind.Slash:
-                    if (left.TypeKind == AstTypeKind.Integer && left == right)
+                    if (left.TypeKind == AstTypeKind.Integer && left.Matches(right))
                         return left;
-                    else
-                        return null;
+                    return null;
 
                 case TokenKind.EqualsEquals:
-                    if (left == right)
+                    if (left.Matches(right))
                         return GetType("bool");
-                    else
-                        return null;
+                    return null;
 
                 case TokenKind.LessThan:
                 case TokenKind.LessThanEquals:
                 case TokenKind.GreaterThan:
                 case TokenKind.GreaterThanEquals:
-                    if (left.TypeKind == AstTypeKind.Integer && left == right)
+                    if (left.TypeKind == AstTypeKind.Integer && left.Matches(right))
                         return GetType("bool");
-                    else
-                        return null;
+                    return null;
 
                 default:
-                    return null;
+                    throw new InvalidOperationException();
             }
         }
 

@@ -15,5 +15,10 @@
         {
             return new AstIntegerType(Size);
         }
+
+        public override bool Matches(AstType other)
+        {
+            return this == other;
+        }
     }
 }

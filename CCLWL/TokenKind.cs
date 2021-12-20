@@ -31,6 +31,7 @@
         Equals,
         LessThan,
         GreaterThan,
+        Ampersand,
 
         PlusEquals,
         MinusEquals,

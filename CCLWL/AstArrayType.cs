@@ -17,5 +17,12 @@
         {
             return new AstArrayType(InnerType, Count);
         }
+
+        public override bool Matches(AstType other)
+        {
+            if (other.TypeKind == AstTypeKind.Array)
+                return InnerType.Matches(((AstArrayType) other).InnerType);
+            return false;
+        }
     }
 }

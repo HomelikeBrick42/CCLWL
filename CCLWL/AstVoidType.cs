@@ -8,5 +8,10 @@
         {
             return new AstVoidType();
         }
+
+        public override bool Matches(AstType other)
+        {
+            return this == other;
+        }
     }
 }

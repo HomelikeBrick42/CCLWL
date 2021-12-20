@@ -34,7 +34,8 @@ namespace CCLWL
             {'/', TokenKind.Slash},
             {'=', TokenKind.Equals},
             {'<', TokenKind.LessThan},
-            {'>', TokenKind.GreaterThan}
+            {'>', TokenKind.GreaterThan},
+            {'&', TokenKind.Ampersand}
         };
 
         public static readonly Dictionary<string, TokenKind> Keywords = new()

@@ -19,5 +19,10 @@ namespace CCLWL
         {
             return new AstFunctionType(ReturnType, Parameters);
         }
+
+        public override bool Matches(AstType other)
+        {
+            return this == other;
+        }
     }
 }

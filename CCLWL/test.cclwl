@@ -23,4 +23,6 @@ void main() {
         int fib = fib(i);
         i += 1;
     }
+    int* c = &i;
+    *c = 5;
 }

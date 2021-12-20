@@ -15,5 +15,12 @@
         {
             return new AstPointerType(PointedTo);
         }
+
+        public override bool Matches(AstType other)
+        {
+            if (other.TypeKind == AstTypeKind.Pointer)
+                return PointedTo.Matches(((AstPointerType) other).PointedTo);
+            return false;
+        }
     }
 }
