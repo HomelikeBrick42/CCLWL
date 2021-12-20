@@ -23,6 +23,6 @@ void main() {
         int fib = fib(i);
         i += 1;
     }
-    int* d = &i;
+    var d = &i;
     *d = 5;
 }

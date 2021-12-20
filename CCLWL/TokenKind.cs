@@ -14,6 +14,7 @@
         WhileKeyword,
         DoKeyword,
         ReturnKeyword,
+        VarKeyword,
 
         Comma,
         Semicolon,

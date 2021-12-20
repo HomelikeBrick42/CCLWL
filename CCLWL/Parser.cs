@@ -221,6 +221,20 @@ namespace CCLWL
                     return new AstReturn(expression);
                 }
 
+                case TokenKind.VarKeyword:
+                {
+                    var varKeyword = ExpectToken(TokenKind.VarKeyword);
+                    var name = ExpectToken(TokenKind.Name);
+                    ExpectToken(TokenKind.Equals);
+                    var value = ParseExpression(null);
+                    ExpectToken(TokenKind.Semicolon);
+                    var declaration = new AstDeclaration(name, value.Type, value);
+                    if (!_scopes[^1].TryAdd((string) name.Value, declaration))
+                        throw new CompileError($"'{(string) name.Value}' is already declared in this scope",
+                            name.Position);
+                    return declaration;
+                }
+
                 default:
                 {
                     var expression = ParseExpression(null);
