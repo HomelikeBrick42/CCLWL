@@ -332,7 +332,7 @@ namespace CCLWL
 
         private AstType ParseDecl(AstType baseType, ref Token name)
         {
-            if (name == null && Current.Kind == TokenKind.Name)
+            if (name == null && Current.Kind == TokenKind.Name && GetType((string)Current.Value) != null)
             {
                 var token = ExpectToken(TokenKind.Name);
                 var nameString = (string) token.Value;
