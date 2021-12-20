@@ -45,7 +45,6 @@ namespace CCLWL
             {"if", TokenKind.IfKeyword},
             {"else", TokenKind.ElseKeyword},
             {"while", TokenKind.WhileKeyword},
-            {"do", TokenKind.DoKeyword},
             {"return", TokenKind.ReturnKeyword},
             {"var", TokenKind.VarKeyword}
         };

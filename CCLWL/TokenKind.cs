@@ -12,7 +12,6 @@
         IfKeyword,
         ElseKeyword,
         WhileKeyword,
-        DoKeyword,
         ReturnKeyword,
         VarKeyword,
 

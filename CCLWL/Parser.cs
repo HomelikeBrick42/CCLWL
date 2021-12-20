@@ -170,13 +170,7 @@ namespace CCLWL
                     var condition = ParseExpression(GetType("bool"));
                     if (condition.Type.TypeKind != AstTypeKind.Bool)
                         throw new CompileError("Expected bool type for `if` condition", ifKeyword.Position);
-                    if (Current.Kind == TokenKind.DoKeyword)
-                    {
-                        ExpectToken(TokenKind.DoKeyword);
-                        var thenStatement = ParseStatement(currentFunction);
-                        return new AstIf(condition, thenStatement, null);
-                    }
-
+                    
                     var thenScope = ParseScope(currentFunction);
                     AstScope elseScope = null;
                     if (Current.Kind == TokenKind.ElseKeyword)
@@ -194,17 +188,8 @@ namespace CCLWL
                     var condition = ParseExpression(GetType("bool"));
                     if (condition.Type.TypeKind != AstTypeKind.Bool)
                         throw new CompileError("Expected bool type for `while` condition", whileKeyword.Position);
-                    if (Current.Kind == TokenKind.DoKeyword)
-                    {
-                        ExpectToken(TokenKind.DoKeyword);
-                        var body = ParseStatement(currentFunction);
-                        return new AstWhile(condition, body);
-                    }
-                    else
-                    {
-                        var body = ParseScope(currentFunction);
-                        return new AstWhile(condition, body);
-                    }
+                    var body = ParseScope(currentFunction);
+                    return new AstWhile(condition, body);
                 }
 
                 case TokenKind.ReturnKeyword:
