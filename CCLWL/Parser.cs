@@ -238,6 +238,8 @@ namespace CCLWL
                                 throw new CompileError("Unable to find binary operator for given types",
                                     @operator.Position);
                         }
+                        else if (!expression.Type.Matches(value.Type))
+                            throw new CompileError("Value type does not match operand type", @operator.Position);
 
                         ExpectToken(TokenKind.Semicolon);
                         return new AstAssignment(expression, @operator, value);
