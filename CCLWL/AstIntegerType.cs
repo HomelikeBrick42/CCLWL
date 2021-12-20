@@ -8,6 +8,12 @@
         }
 
         public override AstTypeKind TypeKind => AstTypeKind.Integer;
+
         public int Size { get; }
+
+        public override AstType Clone()
+        {
+            return new AstIntegerType(Size);
+        }
     }
 }

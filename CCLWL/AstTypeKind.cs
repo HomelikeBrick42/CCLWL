@@ -6,6 +6,6 @@
         Pointer,
         Array,
         Function,
-        Void,
+        Void
     }
 }

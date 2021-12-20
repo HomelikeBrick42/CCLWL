@@ -5,6 +5,6 @@
         Unary,
         Binary,
         Integer,
-        Name,
+        Name
     }
 }

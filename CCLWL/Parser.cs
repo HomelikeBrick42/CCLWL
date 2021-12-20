@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Xsl;
 
 namespace CCLWL
 {
     public sealed class Parser
     {
+        private int _position;
+        private List<Dictionary<string, AstDeclaration>> _scopes;
+
+        private List<Dictionary<string, AstType>> _types;
+
         public Parser(string filepath)
         {
             var lexer = new Lexer(filepath);
@@ -38,10 +41,8 @@ namespace CCLWL
         }
 
         private List<Token> Tokens { get; }
-        private int _position;
 
-        private List<Dictionary<string, AstType>> _types;
-        private List<Dictionary<string, AstDeclaration>> _scopes;
+        private Token Current => _position < Tokens.Count ? Tokens[_position] : Tokens[^1];
 
         private AstType GetType(string name)
         {
@@ -58,8 +59,6 @@ namespace CCLWL
                     return declaration;
             return null;
         }
-
-        private Token Current => _position < Tokens.Count ? Tokens[_position] : Tokens[^1];
 
         private Token NextToken()
         {
@@ -128,11 +127,46 @@ namespace CCLWL
                     return declaration;
                 }
             }
-            else
+
+            switch (Current.Kind)
             {
-                var expression = ParseExpression(null);
-                ExpectToken(TokenKind.Semicolon);
-                return new AstExpressionStatement(expression);
+                case TokenKind.TypedefKeyword:
+                {
+                    var typedefKeyword = ExpectToken(TokenKind.TypedefKeyword);
+                    Token name = null;
+                    var type = ParseDecl(null, ref name);
+                    if (name == null)
+                        throw new CompileError("Expected name for typedef", typedefKeyword.Position);
+                    ExpectToken(TokenKind.Semicolon);
+                    var nameString = (string) name.Value;
+                    if (!_types[^1].TryAdd(nameString, type))
+                        throw new CompileError($"type '{(string) name.Value}' is already defined in this scope",
+                            name.Position);
+                    return new AstTypedef(nameString, type);
+                }
+
+                case TokenKind.DistinctKeyword:
+                {
+                    var distinctKeyword = ExpectToken(TokenKind.DistinctKeyword);
+                    Token name = null;
+                    var type = ParseDecl(null, ref name);
+                    if (name == null)
+                        throw new CompileError("Expected name for distinct", distinctKeyword.Position);
+                    ExpectToken(TokenKind.Semicolon);
+                    var nameString = (string) name.Value;
+                    var typeClone = type.Clone();
+                    if (!_types[^1].TryAdd(nameString, typeClone))
+                        throw new CompileError($"type '{(string) name.Value}' is already defined in this scope",
+                            name.Position);
+                    return new AstDistinct(nameString, typeClone);
+                }
+
+                default:
+                {
+                    var expression = ParseExpression(null);
+                    ExpectToken(TokenKind.Semicolon);
+                    return new AstExpressionStatement(expression);
+                }
             }
         }
 
@@ -195,7 +229,7 @@ namespace CCLWL
 
                     case TokenKind.OpenParenthesis:
                         var errorToken = ExpectToken(TokenKind.OpenParenthesis);
-                        if ((Current.Kind == TokenKind.Name && GetType((string) Current.Value) != null) ||
+                        if (Current.Kind == TokenKind.Name && GetType((string) Current.Value) != null ||
                             Current.Kind == TokenKind.CloseParenthesis)
                         {
                             var parameters = new List<AstDeclaration>();
@@ -326,7 +360,9 @@ namespace CCLWL
                 left = new AstUnary(resultType, @operator, operand);
             }
             else
+            {
                 left = ParsePrimaryExpression(suggestedType);
+            }
 
             while (true)
             {

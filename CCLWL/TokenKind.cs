@@ -6,7 +6,10 @@
 
         Name,
         Integer,
-        
+
+        TypedefKeyword,
+        DistinctKeyword,
+
         Comma,
         Semicolon,
         OpenParenthesis,

@@ -46,7 +46,7 @@ namespace CCLWL
                 return 1;
             }
         }
-        
+
         private static void PrintTypes(AstNode ast)
         {
             switch (ast.Kind)
@@ -59,9 +59,10 @@ namespace CCLWL
                         PrintTypes(statement);
                         Console.WriteLine();
                     }
+
                     break;
                 }
-                
+
                 case AstKind.Statement:
                 {
                     var statement = (AstStatement) ast;
@@ -77,10 +78,11 @@ namespace CCLWL
 
                         case AstStatementKind.Expression:
                             throw new NotImplementedException();
-                        
+
                         default:
                             throw new InvalidOperationException();
                     }
+
                     break;
                 }
 
@@ -128,6 +130,7 @@ namespace CCLWL
                                     useComma = true;
                                 PrintTypes(decl.Type);
                             }
+
                             Console.Write(") returning ");
                             PrintTypes(function.ReturnType);
                             break;
@@ -138,14 +141,14 @@ namespace CCLWL
                             Console.Write("void ");
                             break;
                         }
-                            
+
                         default:
                             throw new InvalidOperationException();
                     }
 
                     break;
                 }
-                
+
                 default:
                     throw new InvalidOperationException();
             }

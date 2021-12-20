@@ -24,12 +24,18 @@ namespace CCLWL
             {']', TokenKind.CloseBracket},
             {'{', TokenKind.OpenBrace},
             {'}', TokenKind.CloseBrace},
-            
+
             {'+', TokenKind.Plus},
             {'-', TokenKind.Minus},
             {'*', TokenKind.Asterisk},
             {'/', TokenKind.Slash},
-            {'=', TokenKind.Equals},
+            {'=', TokenKind.Equals}
+        };
+
+        public static readonly Dictionary<string, TokenKind> Keywords = new()
+        {
+            {"typedef", TokenKind.TypedefKeyword},
+            {"distinct", TokenKind.DistinctKeyword}
         };
 
         private int _column;
@@ -68,12 +74,12 @@ namespace CCLWL
         {
             start:
             var startPos = new SourcePosition(Filepath, Source, _position, _line, _column);
-            
+
             switch (Current)
             {
                 case '\0':
                     return new Token(TokenKind.EndOfFile, startPos, _position - startPos.Position);
-                
+
                 case >= '0' and <= '9':
                 {
                     long intValue = 0;
@@ -115,12 +121,12 @@ namespace CCLWL
                         if (value >= intBase)
                         {
                             var pos = new SourcePosition(Filepath, Source, _position, _line, _column);
-                            throw new CompileError($"Digit '{NextChar()}' too big for base '{intBase}'",pos);
+                            throw new CompileError($"Digit '{NextChar()}' too big for base '{intBase}'", pos);
                         }
 
                         intValue *= intBase;
                         intValue += value;
-                        
+
                         NextChar();
                     }
 
@@ -132,13 +138,22 @@ namespace CCLWL
             {
                 var name = "";
                 while (char.IsLetter(Current) || char.IsDigit(Current) || Current == '_') name += NextChar();
-                return new Token(TokenKind.Name, startPos, _position - startPos.Position, name);
+                return Keywords.ContainsKey(name)
+                    ? new Token(Keywords[name], startPos, _position - startPos.Position)
+                    : new Token(TokenKind.Name, startPos, _position - startPos.Position, name);
             }
 
             var character = NextChar();
 
             if (char.IsWhiteSpace(character))
                 goto start;
+
+            if (character == '/' && Current == '/')
+            {
+                while (Current != '\n' && Current != '\0')
+                    NextChar();
+                goto start;
+            }
 
             if (DoubleChars.ContainsKey(character) && DoubleChars[character].ContainsKey(Current))
             {

@@ -1,5 +1,8 @@
-﻿void main() {
-    int a = 1 + -2 * 3;
-    char b = 5;
-    int c = a + b;
+﻿distinct int yard;
+distinct int meter;
+
+void main() {
+    meter a = 1 + -2 * 3;
+    yard b = 5;
+    // meter c = a + b;
 }

@@ -11,7 +11,13 @@ namespace CCLWL
         }
 
         public override AstTypeKind TypeKind => AstTypeKind.Function;
+
         public AstType ReturnType { get; }
         public IEnumerable<AstDeclaration> Parameters { get; }
+
+        public override AstType Clone()
+        {
+            return new AstFunctionType(ReturnType, Parameters);
+        }
     }
 }

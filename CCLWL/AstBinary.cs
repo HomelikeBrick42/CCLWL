@@ -1,6 +1,6 @@
 ﻿namespace CCLWL
 {
-    public sealed class AstBinary: AstExpression
+    public sealed class AstBinary : AstExpression
     {
         public AstBinary(AstType type, AstExpression left, Token @operator, AstExpression right)
         {

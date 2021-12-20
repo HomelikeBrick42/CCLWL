@@ -2,7 +2,7 @@
 
 namespace CCLWL
 {
-    public sealed class AstFile: AstNode
+    public sealed class AstFile : AstNode
     {
         public AstFile(IEnumerable<AstStatement> statements)
         {

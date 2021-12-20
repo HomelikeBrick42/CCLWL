@@ -6,5 +6,7 @@
         Scope,
         Function,
         Expression,
+        Typedef,
+        Distinct
     }
 }

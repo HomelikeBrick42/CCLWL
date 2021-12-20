@@ -8,6 +8,12 @@
         }
 
         public override AstTypeKind TypeKind => AstTypeKind.Pointer;
+
         public AstType PointedTo { get; }
+
+        public override AstType Clone()
+        {
+            return new AstPointerType(PointedTo);
+        }
     }
 }
