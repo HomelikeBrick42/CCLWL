@@ -32,8 +32,10 @@ namespace CCLWL
                 new()
                 {
                     {"void", new AstVoidType()},
-                    {"int", new AstIntegerType(4)},
-                    {"char", new AstIntegerType(1)}
+                    {"int64", new AstIntegerType(8)},
+                    {"int32", new AstIntegerType(4)},
+                    {"int16", new AstIntegerType(2)},
+                    {"int8", new AstIntegerType(1)}
                 }
             };
 
@@ -186,8 +188,14 @@ namespace CCLWL
 
         private AstType ParseDecl(AstType baseType, ref Token name)
         {
-            if (name == null && Current.Kind == TokenKind.Name && GetType((string) Current.Value) != null)
-                baseType = GetType((string) ExpectToken(TokenKind.Name).Value);
+            if (name == null && Current.Kind == TokenKind.Name)
+            {
+                var token = ExpectToken(TokenKind.Name);
+                var nameString = (string) token.Value;
+                baseType = GetType(nameString);
+                if (baseType == null)
+                    throw new CompileError($"Unable to find type '{nameString}'", token.Position);
+            }
 
             while (Current.Kind == TokenKind.Asterisk)
             {

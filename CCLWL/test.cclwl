@@ -1,4 +1,6 @@
-﻿distinct int yard;
+﻿typedef int32 int;
+
+distinct int yard;
 distinct int meter;
 
 void main() {
