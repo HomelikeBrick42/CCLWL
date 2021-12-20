@@ -109,7 +109,7 @@ namespace CCLWL
                     foreach (var parameter in ((AstFunctionType) type).Parameters)
                         parameters.Add((string) parameter.Name.Value, parameter);
 
-                    var scope = ParseScope((AstFunctionType) type, parameters);
+                    var scope = ParseScope((AstFunctionType) type, true, parameters);
                     return new AstFunction((string) name.Value, type, scope);
                 }
                 else
@@ -211,7 +211,7 @@ namespace CCLWL
             }
         }
 
-        private AstScope ParseScope(AstFunctionType currentFunction,
+        private AstScope ParseScope(AstFunctionType currentFunction, bool mainFunctionScope = false,
             Dictionary<string, AstDeclaration> procedureParameters = null)
         {
             _scopes.Add(procedureParameters ?? new Dictionary<string, AstDeclaration>());
@@ -220,10 +220,19 @@ namespace CCLWL
             var statements = new List<AstStatement>();
             while (Current.Kind != TokenKind.CloseBrace && Current.Kind != TokenKind.EndOfFile)
                 statements.Add(ParseStatement(currentFunction));
-            ExpectToken(TokenKind.CloseBrace);
+            var closeBrace = ExpectToken(TokenKind.CloseBrace);
             _types.RemoveAt(_types.Count - 1);
             _scopes.RemoveAt(_scopes.Count - 1);
-            return new AstScope(statements);
+            var scope = new AstScope(statements);
+            if (mainFunctionScope && !ReturnsInAllCodePaths(scope))
+            {
+                if (currentFunction.ReturnType.TypeKind == AstTypeKind.Void)
+                    statements.Add(new AstReturn(null));
+                else
+                    throw new CompileError("Function does not return in all code paths", closeBrace.Position);
+            }
+
+            return scope;
         }
 
         private AstType ParseDecl(AstType baseType, ref Token name)
@@ -319,6 +328,33 @@ namespace CCLWL
 
             _position = endPos;
             return baseType;
+        }
+
+        private bool ReturnsInAllCodePaths(AstScope scope)
+        {
+            foreach (var statement in scope.Statements)
+            {
+                switch (statement.StatementKind)
+                {
+                    case AstStatementKind.If:
+                        var iff = (AstIf) statement;
+                        if (iff.ElseStatement != null)
+                            if (ReturnsInAllCodePaths((AstScope) iff.ThenStatement) &&
+                                ReturnsInAllCodePaths((AstScope) iff.ElseStatement))
+                                return true;
+                        break;
+
+                    case AstStatementKind.Scope:
+                        if (ReturnsInAllCodePaths((AstScope) statement))
+                            return true;
+                        break;
+
+                    case AstStatementKind.Return:
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         private AstExpression ParseExpression(AstType suggestedType)

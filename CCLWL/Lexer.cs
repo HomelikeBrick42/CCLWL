@@ -73,7 +73,7 @@ namespace CCLWL
             if (current == '\n')
             {
                 _line++;
-                _column = 0;
+                _column = 1;
             }
 
             return current;
