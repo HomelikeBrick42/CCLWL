@@ -6,6 +6,7 @@
         Binary,
         Integer,
         Name,
-        FunctionCall
+        FunctionCall,
+        Cast
     }
 }

@@ -2,7 +2,7 @@
 {
     public sealed class AstIntegerType : AstType
     {
-        public AstIntegerType(int size, bool signed)
+        public AstIntegerType(long size, bool signed)
         {
             Size = size;
             Signed = signed;
@@ -10,7 +10,7 @@
 
         public override AstTypeKind TypeKind => AstTypeKind.Integer;
 
-        public int Size { get; }
+        public override long Size { get; }
         public bool Signed { get; }
 
         public override AstType Clone()

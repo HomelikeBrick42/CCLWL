@@ -11,6 +11,7 @@ namespace CCLWL
         }
 
         public override AstTypeKind TypeKind => AstTypeKind.Function;
+        public override long Size => 0;
 
         public AstType ReturnType { get; }
         public IEnumerable<AstDeclaration> Parameters { get; }

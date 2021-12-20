@@ -8,6 +8,7 @@
         }
 
         public override AstTypeKind TypeKind => AstTypeKind.Pointer;
+        public override long Size => 64;
 
         public AstType PointedTo { get; }
 

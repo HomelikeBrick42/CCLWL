@@ -3,6 +3,7 @@
     public sealed class AstBoolType : AstType
     {
         public override AstTypeKind TypeKind => AstTypeKind.Bool;
+        public override long Size => 8;
 
         public override AstType Clone()
         {

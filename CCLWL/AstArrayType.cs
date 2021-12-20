@@ -9,6 +9,7 @@
         }
 
         public override AstTypeKind TypeKind => AstTypeKind.Array;
+        public override long Size => Count * InnerType.Size;
 
         public AstType InnerType { get; }
         public long Count { get; }

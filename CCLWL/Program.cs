@@ -2,7 +2,7 @@
 
 namespace CCLWL
 {
-    internal class Program
+    internal static class Program
     {
         private static int Main(string[] args)
         {

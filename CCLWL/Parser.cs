@@ -468,10 +468,26 @@ namespace CCLWL
 
                 case TokenKind.OpenParenthesis:
                 {
-                    ExpectToken(TokenKind.OpenParenthesis);
-                    var expression = ParseExpression(suggestedType);
-                    ExpectToken(TokenKind.CloseParenthesis);
-                    return expression;
+                    var openParenthesis = ExpectToken(TokenKind.OpenParenthesis);
+                    if (Current.Kind == TokenKind.Name && GetType((string) Current.Value) != null)
+                    {
+                        Token name = null;
+                        var type = ParseDecl(null, ref name);
+                        if (name != null)
+                            throw new CompileError("Unexpected name in cast", name.Position);
+                        ExpectToken(TokenKind.CloseParenthesis);
+                        var expression = ParseExpression(type);
+                        // TODO: Disallow struct/union casts
+                        if (type.TypeKind != expression.Type.TypeKind && type.Size != expression.Type.Size)
+                            throw new CompileError("Cannot cast type", openParenthesis.Position);
+                        return new AstCast(type, expression);
+                    }
+                    else
+                    {
+                        var expression = ParseExpression(suggestedType);
+                        ExpectToken(TokenKind.CloseParenthesis);
+                        return expression;
+                    }
                 }
 
                 default:
